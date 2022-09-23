@@ -1,4 +1,3 @@
-from email import contentmanager
 from pysproto.sproto import SprotoType
 from pysproto.sproto_exception import SprotoException
 
@@ -13,6 +12,18 @@ def dword_to_int(dword: bytes):
 
 
 class SprotoEncoder:
+
+    @staticmethod
+    def encode_string(src: str) -> bytes:
+        header = bytearray(src.__len__().to_bytes(4, 'little'))
+        data = src.encode('utf-8')
+        header.extend(data)
+        return header
+
+    @staticmethod
+    def encode_desc_int(src: int) -> bytes:
+        return ((src+1)*2).to_bytes(2, 'little')
+
     @staticmethod
     def encode(proto_type: SprotoType, data: dict) -> bytes:
         count = 0
@@ -39,12 +50,34 @@ class SprotoEncoder:
 
             if data_type == int:
                 tmp = int(content)
-                desc.extend(((tmp+1)*2).to_bytes(2, 'little'))
+                desc.extend(SprotoEncoder.encode_desc_int(tmp))
             elif data_type == str:
                 tmp = str(content)
                 desc.extend(b'\x00\x00')
-                data_section.extend(tmp.__len__().to_bytes(4, 'little'))
-                data_section.extend(tmp.encode('utf-8'))
+                data_section.extend(SprotoEncoder.encode_string(tmp))
+            elif data_type.__qualname__ == 'list':
+                tmp = list(content)
+                desc.extend(b'\x00\x00')
+                list_sz = 0
+                tmp_encoded = bytearray()
+                member_type = None
+                for member in tmp:
+                    encoded = bytes()
+                    member_type = type(member)
+                    # TODO: implement int64, struct, boolean
+                    if member_type == str:
+                        encoded = SprotoEncoder.encode_string(member)
+                    elif member_type == int:
+                        encoded = int(member).to_bytes(4, 'little')
+                    tmp_encoded.extend(encoded)
+                    list_sz += encoded.__len__()
+
+                if member_type == int:
+                    list_sz += 1
+                data_section.extend(list_sz.to_bytes(4, 'little'))
+                if member_type == int:
+                    data_section.extend(int(4).to_bytes(1, 'little'))
+                data_section.extend(tmp_encoded)
 
             count += 1
         rs = bytearray(count.to_bytes(2, 'little'))
@@ -73,6 +106,7 @@ class SprotoEncoder:
 
             tag_name = sproto_type.member(current_tag).type_name()
             tag_type = sproto_type.member(current_tag).type()
+            current_tag += 1
 
             if tmp == 0:
                 # data in data section
@@ -84,7 +118,7 @@ class SprotoEncoder:
             val = tmp // 2 - 1
             rs[tag_name] = val
 
-            current_tag += 1
+            
         for i in range(0, data_section_count):
             data_sz = dword_to_int(data[current_i:current_i+4])
             current_i += 4
@@ -93,6 +127,26 @@ class SprotoEncoder:
             val = None
             if tag_type == str:
                 val = data[current_i:current_i+data_sz].decode('utf-8')
+            elif tag_type.__qualname__ == 'list':
+                if tag_type == list[str]:
+                    val = []
+                    tmp_i = current_i
+                    while tmp_i < current_i + data_sz:
+                        str_len = dword_to_int(data[tmp_i:tmp_i+4])
+                        decoded = data[tmp_i+4: tmp_i +
+                                       4+str_len].decode('utf-8')
+                        val.append(decoded)
+                        tmp_i += 4+str_len
+                elif tag_type == list[int]:
+                    val = []
+                    tmp_i = current_i
+                    int_len = data[tmp_i]
+                    tmp_i += 1
+                    while tmp_i < current_i + data_sz:
+                        decoded = word_to_int(data[tmp_i:tmp_i+int_len])
+                        tmp_i += int_len
+                        val.append(decoded)
+
             current_i += data_sz
             rs[tag_name] = val
         return rs, current_i

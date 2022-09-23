@@ -1,13 +1,9 @@
 from enum import Enum
-from pysproto.sproto_exception import SprotoException
+from pysproto.sproto_exception import SprotoInterpretException
 from pysproto.sproto import Sproto, SprotoField, SprotoProtocal, SprotoType
 from typing import Union
 
 import re
-
-
-class SprotoInterpretException(SprotoException):
-    pass
 
 
 class TokenType(Enum):
@@ -217,10 +213,16 @@ class SprotoInterpreter:
 
         # the type, name must in valid types
         token = self.__tokenizer.get_token()
-        check_token_type(token, TokenType.NORMAL_NAME)
-        if token.content not in self.__valid_types.keys():
+        check_token_type(token, (TokenType.NORMAL_NAME, TokenType.ARRAY_NAME))
+        content = token.content
+        if token.token_type == TokenType.ARRAY_NAME:
+            content = content[1:content.__len__()]
+        if content not in self.__valid_types.keys():
             raise SprotoInterpretException(
-                'syntax error {}'.format(token.content))
-        field_type = self.__valid_types.get(token.content)
+                'syntax error {}'.format(content))
+        if token.token_type == TokenType.NORMAL_NAME:
+            field_type = self.__valid_types.get(content)
+        elif token.token_type == TokenType.ARRAY_NAME:
+            field_type = list[self.__valid_types.get(content)]
 
         return SprotoField(tag, field_name, field_type)
