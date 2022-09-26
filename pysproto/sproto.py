@@ -53,7 +53,7 @@ class SprotoType:
         return self.__name
 
 
-class SprotoProtocal:
+class SprotoProtocol:
     __tag: int
     __name: str
     __types: dict[str, SprotoType]
@@ -77,17 +77,17 @@ class SprotoProtocal:
 
 class Sproto:
     __types: dict[str, SprotoType]
-    __protocals: dict[str, SprotoProtocal]
+    __protocols: dict[str, SprotoProtocol]
 
-    def __init__(self, _types: dict[str, SprotoType], _protocals: dict[str, SprotoProtocal]) -> None:
+    def __init__(self, _types: dict[str, SprotoType], _protocols: dict[str, SprotoProtocol]) -> None:
         self.__types = _types
-        self.__protocals = _protocals
+        self.__protocols = _protocols
 
     def get_package(self) -> SprotoType:
         return self.__types.get('package')
 
-    def get_protocal(self, name: str) -> SprotoProtocal:
-        return self.__protocals.get(name)
+    def get_protocol(self, name: str) -> SprotoProtocol:
+        return self.__protocols.get(name)
 
     def get_type(self, name: str) -> SprotoType:
         return self.__types.get(name)

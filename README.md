@@ -16,5 +16,5 @@ python test.py
 ```
 
 # TODO
-decoder & interpreter of arrays
+decoder & interpreter of boolean
 decoder & interpreter of custom types

@@ -1,6 +1,6 @@
 from enum import Enum
 from pysproto.sproto_exception import SprotoInterpretException
-from pysproto.sproto import Sproto, SprotoField, SprotoProtocal, SprotoType
+from pysproto.sproto import Sproto, SprotoField, SprotoProtocol, SprotoType
 from typing import Union
 
 import re
@@ -92,10 +92,10 @@ class SprotoTokenizer:
 
 '''
 Rules:
-init->[SprotoTyes|SprotoProtocals]->EOF    Sproto
+init->[SprotoTyes|SprotoProtocols]->EOF    Sproto
 normal_name->tag->':'->type|SprotoType         SprotoField
 normal_name|type_name->'{'->[SprotoFields]->'}'  SprotoType
-normal_name->tag->'{'->[SprotoTypes]->'}'      SprotoProtocal
+normal_name->tag->'{'->[SprotoTypes]->'}'      SprotoProtocol
 '''
 
 
@@ -138,20 +138,20 @@ class SprotoInterpreter:
         token_type = token.token_type
         token_content = token.content
         sproto_types = {}
-        sproto_protocals = {}
+        sproto_protocols = {}
         while token_type is not TokenType.EOF:
             if token_type == TokenType.ARRAY_NAME:
                 pass
             elif token_type == TokenType.NORMAL_NAME:
-                # it must be a protocal
-                protocal_name = token_content
+                # it must be a protocol
+                protocol_name = token_content
                 token = self.__tokenizer.get_token()
                 check_token_type(token, TokenType.TAG)
                 tag = int(token.content)
                 token = self.__tokenizer.get_token()
                 check_start_token(token)
-                sproto_protocals[protocal_name] = self.__interpret_protocal(
-                    protocal_name, tag)
+                sproto_protocols[protocol_name] = self.__interpret_protocol(
+                    protocol_name, tag)
 
             elif token_type == TokenType.TYPE_NAME:
                 type_name = token_content[1:token_content.__len__()]
@@ -168,7 +168,7 @@ class SprotoInterpreter:
             token = self.__tokenizer.get_token()
             token_type = token.token_type
             token_content = token.content
-        return Sproto(sproto_types, sproto_protocals)
+        return Sproto(sproto_types, sproto_protocols)
 
     def __interpret_type(self, type_name: str) -> SprotoType:
         fields = []
@@ -179,7 +179,7 @@ class SprotoInterpreter:
             token = self.__tokenizer.get_token()
         return SprotoType(type_name, fields)
 
-    def __interpret_protocal(self, protocal_name: str, protocal_tag: int) -> SprotoProtocal:
+    def __interpret_protocol(self, protocol_name: str, protocol_tag: int) -> SprotoProtocol:
         types = {}
 
         token = self.__tokenizer.get_token()
@@ -192,7 +192,7 @@ class SprotoInterpreter:
             types[type_name] = sproto_type
             token = self.__tokenizer.get_token()
 
-        return SprotoProtocal(protocal_tag, protocal_name, types)
+        return SprotoProtocol(protocol_tag, protocol_name, types)
 
     def __interpret_field(self) -> SprotoField:
         token = self.__tokenizer.get_token()
