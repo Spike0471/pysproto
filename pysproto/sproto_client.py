@@ -1,4 +1,5 @@
 from socket import socket
+from typing import Tuple, Dict
 
 from pysproto.sproto import Sproto, SprotoProtocol, SprotoType
 from pysproto.sproto_encoder import SprotoEncoder
@@ -25,7 +26,7 @@ class SprotoClient:
     def __exit__(self, *args):
         self.__sock.__exit__(*args)
 
-    def recv_response(self):
+    def recv_response(self) -> Tuple[int, Dict]:
         recved = self.__sock.recv(1024)
         if recved == b'':
             return
@@ -41,8 +42,7 @@ class SprotoClient:
             if proto_type is not None:
                 rs, start = SprotoEncoder.decode(
                     proto_type, unpacked[start:unpacked.__len__()])
-            print('response :{}'.format(session))
-            print('content: {}'.format(rs))
+        return (session, rs)
 
     def send_reqeust(self, name: str, args: dict = None):
         package = self.__client_sproto.get_package()

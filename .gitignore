@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+pysproto_rsa.pub
+pysproto_rsa
+
 # Distribution / packaging
 .Python
 build/
