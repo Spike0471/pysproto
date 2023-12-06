@@ -1,4 +1,4 @@
-
+from typing import List,Dict
 
 class SprotoField:
     __tag: int
@@ -22,9 +22,9 @@ class SprotoField:
 
 class SprotoType:
     __name: str
-    __members: list[SprotoField]
+    __members: List[SprotoField]
 
-    def __init__(self, _name, _members: list[SprotoField]) -> None:
+    def __init__(self, _name, _members: List[SprotoField]) -> None:
         self.__name = _name
         self.__members = []
         # ensure it's an ascending sequence
@@ -40,7 +40,7 @@ class SprotoType:
             else:
                 self.__members.insert(insert_i, field)
 
-    def members(self) -> list[SprotoField]:
+    def members(self) -> List[SprotoField]:
         return self.__members
 
     def member(self, tag) -> SprotoField:
@@ -56,9 +56,9 @@ class SprotoType:
 class SprotoProtocol:
     __tag: int
     __name: str
-    __types: dict[str, SprotoType]
+    __types: Dict[str, SprotoType]
 
-    def __init__(self, _tag: int, _name: str, _types: dict[str, SprotoType] = None) -> None:
+    def __init__(self, _tag: int, _name: str, _types: Dict[str, SprotoType] = None) -> None:
         self.__tag = _tag
         self.__name = _name
         self.__types = _types
@@ -76,10 +76,10 @@ class SprotoProtocol:
 
 
 class Sproto:
-    __types: dict[str, SprotoType]
-    __protocols: dict[str, SprotoProtocol]
+    __types: Dict[str, SprotoType]
+    __protocols: Dict[str, SprotoProtocol]
 
-    def __init__(self, _types: dict[str, SprotoType], _protocols: dict[str, SprotoProtocol]) -> None:
+    def __init__(self, _types: Dict[str, SprotoType], _protocols: Dict[str, SprotoProtocol]) -> None:
         self.__types = _types
         self.__protocols = _protocols
 

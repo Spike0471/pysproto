@@ -1,7 +1,7 @@
 from enum import Enum
 from pysproto.sproto_exception import SprotoInterpretException
 from pysproto.sproto import Sproto, SprotoField, SprotoProtocol, SprotoType
-from typing import Union
+from typing import Union, List, Tuple
 
 import re
 
@@ -35,7 +35,7 @@ SIGN_PATTERN = '\{|\}|\:'
 
 
 class SprotoTokenizer:
-    __tokens: list[SprotoToken] = []
+    __tokens: List[SprotoToken] = []
     __current_token_index: int = 0
     __patterns = {
         TYPE_NAME_PATTERN: TokenType.TYPE_NAME,
@@ -45,7 +45,7 @@ class SprotoTokenizer:
         SIGN_PATTERN: TokenType.SIGN
     }
 
-    def __init__(self, lines: Union[str, list[str]] = None) -> None:
+    def __init__(self, lines: Union[str, List[str]] = None) -> None:
         if lines is not None:
             if type(lines) is str:
                 lines = lines.strip()
@@ -75,7 +75,7 @@ class SprotoTokenizer:
                 raise SprotoInterpretException(
                     'token {}... doesn\'t match any pattern.'.format(remain[0:10]))
 
-    def add_lines(self, lines: list[str]):
+    def add_lines(self, lines: List[str]):
         for line in lines:
             line = line.strip()
             self.add_line(line)
@@ -112,7 +112,7 @@ def check_start_token(token: SprotoToken):
         raise SprotoInterpretException('syntax error, should be a start token')
 
 
-def check_token_type(token: SprotoToken, token_type: Union[TokenType, tuple[TokenType]]):
+def check_token_type(token: SprotoToken, token_type: Union[TokenType, Tuple[TokenType]]):
     valid = False
     if type(token_type) is TokenType:
         valid = token.token_type == token_type
@@ -223,6 +223,6 @@ class SprotoInterpreter:
         if token.token_type == TokenType.NORMAL_NAME:
             field_type = self.__valid_types.get(content)
         elif token.token_type == TokenType.ARRAY_NAME:
-            field_type = list[self.__valid_types.get(content)]
+            field_type = List[self.__valid_types.get(content)]
 
         return SprotoField(tag, field_name, field_type)
