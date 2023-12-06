@@ -17,12 +17,9 @@ class TokenType(Enum):
 
 
 class SprotoToken:
-    content: str
-    token_type: TokenType
-
     def __init__(self, t: TokenType, c: str = '') -> None:
-        self.content = c
-        self.token_type = t
+        self.content: str = c
+        self.token_type: TokenType = t
 
 
 BLANK = [' ', '\n', '\r', '\0', '\t', '\f']
@@ -35,17 +32,17 @@ SIGN_PATTERN = '\{|\}|\:'
 
 
 class SprotoTokenizer:
-    __tokens: List[SprotoToken] = []
-    __current_token_index: int = 0
-    __patterns = {
-        TYPE_NAME_PATTERN: TokenType.TYPE_NAME,
-        NORMAL_NAME_PATTERN: TokenType.NORMAL_NAME,
-        ARRAY_NAME_PATTERN: TokenType.ARRAY_NAME,
-        TAG_PATTERN: TokenType.TAG,
-        SIGN_PATTERN: TokenType.SIGN
-    }
 
     def __init__(self, lines: Union[str, List[str]] = None) -> None:
+        self.__tokens: List[SprotoToken] = []
+        self.__current_token_index: int = 0
+        self.__patterns = {
+            TYPE_NAME_PATTERN: TokenType.TYPE_NAME,
+            NORMAL_NAME_PATTERN: TokenType.NORMAL_NAME,
+            ARRAY_NAME_PATTERN: TokenType.ARRAY_NAME,
+            TAG_PATTERN: TokenType.TAG,
+            SIGN_PATTERN: TokenType.SIGN
+        }
         if lines is not None:
             if type(lines) is str:
                 lines = lines.strip()
@@ -124,14 +121,13 @@ def check_token_type(token: SprotoToken, token_type: Union[TokenType, Tuple[Toke
 
 
 class SprotoInterpreter:
-    __tokenizer: SprotoTokenizer
     __valid_types = {
         'integer': int,
         'string': str,
     }
 
     def __init__(self, tokenizer: SprotoTokenizer) -> None:
-        self.__tokenizer = tokenizer
+        self.__tokenizer: SprotoTokenizer = tokenizer
 
     def interpret(self) -> Sproto:
         token = self.__tokenizer.get_token()

@@ -10,12 +10,9 @@ class SourceType(Enum):
 
 
 class Sprotoparser:
-    __src: str
-    __type: SourceType
-
     def __init__(self, _src: str, _type: SourceType) -> None:
-        self.__src = _src
-        self.__type = _type
+        self.__src: str = _src
+        self.__type: SourceType = _type
 
     def parse(self) -> Sproto:
         if self.__type == SourceType.FILE:

@@ -6,17 +6,11 @@ from pysproto.sproto_encoder import SprotoEncoder
 
 
 class SprotoClient:
-    __sock: socket
-    __client_sproto: Sproto
-    __server_sproto: Sproto
-    __session: int
-    __sessions_protocol: dict
-
     def __init__(self, ip: str, port: int, client_sproto: Sproto, server_sproto: Sproto) -> None:
-        self.__sock = socket()
-        self.__client_sproto = client_sproto
-        self.__server_sproto = server_sproto
-        self.__session = 0
+        self.__sock: socket = socket()
+        self.__client_sproto: Sproto = client_sproto
+        self.__server_sproto: Sproto = server_sproto
+        self.__session: int = 0
         self.__sessions_protocol: dict[str, SprotoProtocol] = {}
         self.__sock.connect((ip, port))
 

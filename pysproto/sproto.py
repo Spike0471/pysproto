@@ -1,14 +1,11 @@
-from typing import List,Dict
+from typing import List, Dict
+
 
 class SprotoField:
-    __tag: int
-    __name: str
-    __type: type
-
     def __init__(self, _tag: int, _name: str, _type: type) -> None:
-        self.__tag = _tag
-        self.__name = _name
-        self.__type = _type
+        self.__tag: int = _tag
+        self.__name: str = _name
+        self.__type: type = _type
 
     def tag(self) -> int:
         return self.__tag
@@ -21,12 +18,9 @@ class SprotoField:
 
 
 class SprotoType:
-    __name: str
-    __members: List[SprotoField]
-
     def __init__(self, _name, _members: List[SprotoField]) -> None:
-        self.__name = _name
-        self.__members = []
+        self.__name: str = _name
+        self.__members: List[SprotoField] = []
         # ensure it's an ascending sequence
         for field in _members:
             current_len = self.__members.__len__()
@@ -54,14 +48,10 @@ class SprotoType:
 
 
 class SprotoProtocol:
-    __tag: int
-    __name: str
-    __types: Dict[str, SprotoType]
-
     def __init__(self, _tag: int, _name: str, _types: Dict[str, SprotoType] = None) -> None:
-        self.__tag = _tag
-        self.__name = _name
-        self.__types = _types
+        self.__tag: int = _tag
+        self.__name: str = _name
+        self.__types: Dict[str, SprotoType] = _types
 
     def tag(self) -> int:
         return self.__tag
@@ -76,12 +66,9 @@ class SprotoProtocol:
 
 
 class Sproto:
-    __types: Dict[str, SprotoType]
-    __protocols: Dict[str, SprotoProtocol]
-
     def __init__(self, _types: Dict[str, SprotoType], _protocols: Dict[str, SprotoProtocol]) -> None:
-        self.__types = _types
-        self.__protocols = _protocols
+        self.__types: Dict[str, SprotoType] = _types
+        self.__protocols: Dict[str, SprotoProtocol] = _protocols
 
     def get_package(self) -> SprotoType:
         return self.__types.get('package')
