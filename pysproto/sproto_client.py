@@ -1,4 +1,4 @@
-from socket import socket
+import socket
 from typing import Tuple, Dict
 
 from pysproto.sproto import Sproto, SprotoProtocol, SprotoType
@@ -10,7 +10,7 @@ import threading
 class SprotoClient:
     def __init__(self, ip: str, port: int, client_sproto: Sproto, server_sproto: Sproto) -> None:
         self.__mutex = threading.Lock()
-        self.__sock: socket = socket()
+        self.__sock: socket.socket = socket.socket()
         self.__client_sproto: Sproto = client_sproto
         self.__server_sproto: Sproto = server_sproto
         self.__session: int = 0
@@ -31,7 +31,7 @@ class SprotoClient:
             recved = b''
             try:
                 recved = self.__sock.recv(1024)
-            except TimeoutError:
+            except socket.timeout:
                 return (None, None)
             if recved == b'' or recved == None:
                 return (None, None)
