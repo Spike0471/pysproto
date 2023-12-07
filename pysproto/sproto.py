@@ -59,10 +59,13 @@ class SprotoProtocol:
     def proto_name(self) -> str:
         return self.__name
 
-    def get_types(self, type_name: str) -> SprotoType:
+    def get_type(self, type_name: str) -> SprotoType:
         if self.__types is None:
             return None
         return self.__types.get(type_name)
+
+    def get_types(self) -> Dict[str, SprotoType]:
+        return self.__types
 
 
 class Sproto:
@@ -78,3 +81,9 @@ class Sproto:
 
     def get_type(self, name: str) -> SprotoType:
         return self.__types.get(name)
+
+    def get_protocol_by_tag(self, tag: int) -> SprotoProtocol:
+        for protocol in self.__protocols.values():
+            if protocol.tag() == tag:
+                return protocol
+        return None
